@@ -5,6 +5,7 @@ import saccade_analysis
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm     
+from dwell_analysis import dwell_times
 """
 Viewing distance = 19 cm    
 Monitor : 1920X1080 
@@ -45,7 +46,7 @@ def main():
     # saccade_onsets_ts, saccade_offsets_ts = saccade_analysis.detect_saccades(eyelink,pt_thresh)
 
     target_df['max_radius'] = target_df[['azimuth_radius', 'elevation_radius']].max(axis=1)
-    trial_count = 0
+    # trial_count = 0
     dict_save = {}
     for idx in tqdm(range(len(trial_df))):
         print(f'current trial: {idx+1}')
@@ -60,6 +61,10 @@ def main():
         filtered_data = eyelink[(eyelink.index >= trial_start) & (eyelink.index <= trial_end)]
         
         utils.plot_saccade_landings(idx,target_center,target_radius,target_df,current_target,saccade_offsets_ts,trial_start,trial_end,filtered_data)
+        
+        #get dwell times
+        dwell_time_target, dwell_time_dist = dwell_times(target_center, target_radius, target_df, current_target, trial_start, trial_end, filtered_data)
+
         num_saccades_per_trial = 0
         number_saccades_target, number_saccades_distractor = 0, 0
         saccade_vel_list_target,saccade_amp_list_target = [], []
@@ -117,6 +122,9 @@ def main():
         dict_save[f'{idx+1}']["saccade_amp_dist"] = np.nanmean(saccade_amp_list_dist)
         dict_save[f'{idx+1}']["num_sacc_dist"] = number_saccades_distractor
         dict_save[f'{idx+1}']["num_sacc_target"] = number_saccades_target
+        dict_save[f'{idx+1}']["dwell_time_target_ms"] = dwell_time_target
+        dict_save[f'{idx+1}']["dwell_time_distractor_ms"] = dwell_time_dist
+        dict_save[f'{idx+1}']["trial"] = idx+1
         # print(f'Number of saccades during trial: {num_saccades_per_trial}')
         # print(f'number of saccades (dist): {number_saccades_distractor}')
         # print(f'number of saccades (target): {number_saccades_target}')

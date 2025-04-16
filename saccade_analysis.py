@@ -7,7 +7,6 @@ import pandas as pd
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-
 """
 1. Peak Detection:
 First, you need to have detected saccade peaks using the velocity threshold estimation method.
